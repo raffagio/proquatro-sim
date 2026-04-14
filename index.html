@@ -62,6 +62,23 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .nav-grid{display:grid;grid-template-columns:1fr 42px 1fr;grid-template-rows:30px 42px 30px;gap:5px}
 .nav-grid .key,.nav-grid .key-enter,.nav-grid .key-power{width:100%;height:100%;flex:none}
 .nav-grid .key-power{border-radius:50%}
+
+#briefing{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .6s}
+#briefing.fade{opacity:0;pointer-events:none}
+.bcard{background:#060e06;border:1px solid #00ff41;border-radius:10px;padding:22px 24px;max-width:320px;width:92%;font-family:'Share Tech Mono',monospace;color:#00ff41;box-shadow:0 0 40px rgba(0,255,65,.15)}
+.btag{font-size:10px;opacity:.5;letter-spacing:3px;margin-bottom:2px}
+.btitle{font-size:18px;letter-spacing:4px;margin-bottom:4px}
+.bdiv{border-top:1px solid rgba(0,255,65,.3);margin:12px 0}
+.bloc{font-size:11px;opacity:.7;line-height:1.8;margin-bottom:4px}
+.bsec{font-size:10px;opacity:.5;letter-spacing:2px;margin-bottom:6px;margin-top:10px}
+.bmeas{font-size:12px;line-height:2;padding-left:4px}
+.bmeas span{opacity:.6;margin-right:6px}
+.bnotes{font-size:11px;line-height:1.9;opacity:.75;margin-top:4px}
+.bnotes li{list-style:none;padding-left:0;margin:0}
+.bnotes li::before{content:'→ ';opacity:.5}
+.bbtn{display:block;width:100%;margin-top:18px;padding:12px;background:transparent;border:1px solid #00ff41;border-radius:6px;color:#00ff41;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:2px;cursor:pointer;transition:background .2s,box-shadow .2s}
+.bbtn:hover{background:rgba(0,255,65,.1);box-shadow:0 0 16px rgba(0,255,65,.2)}
+.bbtn:active{background:rgba(0,255,65,.2)}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -100,7 +117,41 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 </div>
 
 </div>
+<div id="briefing">
+  <div class="bcard">
+    <div class="btag">FIELD BRIEFING</div>
+    <div class="btitle">ORPHEUS ISLAND</div>
+    <div class="bloc">Site: Reef Flat &nbsp;·&nbsp; GBR, QLD<br>Exercise: Water Quality Assessment</div>
+    <div class="bdiv"></div>
+    <div class="bsec">INSTRUMENT</div>
+    <div class="bloc" style="opacity:.9;font-size:12px">YSI ProQuatro<br>Multiparameter Meter</div>
+    <div class="bsec">MEASURING</div>
+    <div class="bmeas">
+      <span>→</span>Temperature (°C)<br>
+      <span>→</span>Dissolved oxygen (mg/L)<br>
+      <span>→</span>Salinity (ppt)<br>
+      <span>→</span>pH
+    </div>
+    <div class="bdiv"></div>
+    <div class="bsec">FIELD NOTES</div>
+    <ul class="bnotes">
+      <li>Keep probes moist at all times</li>
+      <li>Hold mid-water — do not touch bottom</li>
+      <li>Move probe gently — avoid stirring</li>
+      <li>Rinse with distilled water between sites</li>
+    </ul>
+    <button class="bbtn" id="startBtn">[ POWER ON INSTRUMENT ]</button>
+  </div>
+</div>
+
 <script>
+
+document.getElementById('startBtn').addEventListener('click',function(){
+  var b=document.getElementById('briefing');
+  b.classList.add('fade');
+  setTimeout(function(){b.style.display='none';},600);
+  setTimeout(function(){handle('power');},300);
+});
 const lcd=document.getElementById('lcd'),li=document.getElementById('li');
 const S={power:false,lit:false,scr:'off',idx:0,calP:'',calProg:0,calT:null,logs:[],
   sens:{
