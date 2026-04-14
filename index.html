@@ -98,7 +98,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
     <div style="height:4px"></div>
   </div>
 </div>
- 
+
 </div>
 <script>
 const lcd=document.getElementById('lcd'),li=document.getElementById('li');
@@ -106,14 +106,14 @@ const S={power:false,lit:false,scr:'off',idx:0,calP:'',calProg:0,calT:null,logs:
   sens:{
     do:{n:'DO',u:'mg/L',on:true,v:()=>R.do},
     ph:{n:'pH',u:'',on:true,v:()=>R.ph},
-    cond:{n:'SpCond',u:'µS/cm',on:true,v:()=>R.cond},
+    sal:{n:'Sal',u:'ppt',on:true,v:()=>R.sal},
     temp:{n:'Temp',u:'°C',on:true,v:()=>R.temp},
     orp:{n:'ORP',u:'mV',on:true,v:()=>R.orp},
     nh4:{n:'NH4+',u:'mg/L',on:false,v:()=>R.nh4},
     no3:{n:'NO3-',u:'mg/L',on:false,v:()=>R.no3}
   }
 };
-const R={do:7.42,ph:7.18,cond:387,temp:27.3,orp:212,nh4:0.24,no3:1.8};
+const R={do:6.92,ph:7.81,sal:35.4,temp:27.4,orp:248,nh4:0.12,no3:0.4};
 const rnd=(a,b)=>Math.random()*(b-a)+a,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),ff=(n,d)=>n.toFixed(d);
 const nowt=()=>{const d=new Date();return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
 const sbar=()=>`<div class="sbar"><span>SITE:--</span><span>BAT:||||</span><span>${nowt()}</span></div>`;
@@ -126,7 +126,7 @@ function render(){
     case 'splash':li.innerHTML=`<div class="splash"><div class="spl-t">YSI</div><div class="spl-s">ProQuatro</div><div class="spl-s" style="font-size:11px">Professional Series</div><div class="spl-d">Initializing...</div></div>`;break;
     case 'run':{
       const rows=Object.keys(S.sens).filter(k=>S.sens[k].on).slice(0,5).map(k=>{
-        const s=S.sens[k],v=s.v(),d=k==='do'?2:k==='ph'?2:k==='cond'?1:k==='temp'?1:k==='orp'?0:2,sg=k==='orp'&&v>=0?'+':'';
+        const s=S.sens[k],v=s.v(),d=k==='do'?2:k==='ph'?2:k==='sal'?1:k==='temp'?1:k==='orp'?0:2,sg=k==='orp'&&v>=0?'+':'';
         return `<div class="param-row"><span class="pl">${s.n}</span><span><span class="pv">${sg}${ff(v,d)}</span><span class="pu">${s.u}</span></span></div>`;
       }).join('');
       li.innerHTML=sbar()+rows+`<div class="lfoot">ENT=Log · 1-4=Menus · B=Light</div>`;break;
@@ -137,7 +137,7 @@ function render(){
     case 'probe':li.innerHTML=mH('SENSOR SETUP',Object.keys(S.sens).map(k=>({l:S.sens[k].n,r:S.sens[k].on?'ON':'OFF'})),S.idx);break;
     case 'cal':li.innerHTML=mH('CALIBRATE',[{l:'DO'},{l:'pH'},{l:'Conductivity'},{l:'ORP'},{l:'NH4+'},{l:'NO3-'}],S.idx);break;
     case 'cal_s':{
-      const cfgs={DO:['100% sat','mg/L',ff(R.do,2)],pH:['Buffer 7.00','pH',ff(R.ph,2)],Conductivity:['1000 µS/cm','µS/cm',ff(R.cond,1)],ORP:['220 mV std','mV',ff(R.orp,0)],'NH4+':['1.00 mg/L','mg/L',ff(R.nh4,2)],'NO3-':['10.0 mg/L','mg/L',ff(R.no3,1)]};
+      const cfgs={DO:['100% sat','mg/L',ff(R.do,2)],pH:['Buffer 7.00','pH',ff(R.ph,2)],Salinity:['35.0 ppt std','ppt',ff(R.sal,1)],ORP:['220 mV std','mV',ff(R.orp,0)],'NH4+':['1.00 mg/L','mg/L',ff(R.nh4,2)],'NO3-':['10.0 mg/L','mg/L',ff(R.no3,1)]};
       const c=cfgs[S.calP]||cfgs.DO;
       li.innerHTML=iH(`CAL: ${S.calP}`,[['Current:',`${c[2]} ${c[1]}`],['Reference:',c[0]]],'ENT=Accept  ESC=Cancel');break;
     }
@@ -197,7 +197,7 @@ function handle(a){
 function dL(){
   const data={};
   Object.keys(S.sens).filter(k=>S.sens[k].on).forEach(k=>{
-    const s=S.sens[k],v=s.v(),d=k==='do'?2:k==='ph'?2:k==='cond'?1:k==='temp'?1:k==='orp'?0:2,sg=k==='orp'&&v>=0?'+':'';
+    const s=S.sens[k],v=s.v(),d=k==='do'?2:k==='ph'?2:k==='sal'?1:k==='temp'?1:k==='orp'?0:2,sg=k==='orp'&&v>=0?'+':'';
     data[s.n]=`${sg}${ff(v,d)} ${s.u}`;
   });
   S.logs.push({time:nowt(),data});
@@ -214,7 +214,7 @@ function kC(){if(S.calT){clearInterval(S.calT);S.calT=null;}}
 setInterval(()=>{
   if(!S.power)return;
   R.do=cl(R.do+rnd(-.04,.04),5,12);R.ph=cl(R.ph+rnd(-.015,.015),6,9);
-  R.cond=cl(R.cond+rnd(-2,2),200,800);R.temp=cl(R.temp+rnd(-.04,.04),15,35);R.orp=cl(R.orp+rnd(-3,3),100,400);
+  R.sal=cl(R.sal+rnd(-.05,.05),30,40);R.temp=cl(R.temp+rnd(-.04,.04),15,35);R.orp=cl(R.orp+rnd(-3,3),100,400);
   if(S.scr==='run')render();
 },2200);
 document.querySelectorAll('.key').forEach(b=>{
