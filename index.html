@@ -6,15 +6,15 @@
 <title>YSI ProQuatro Simulator</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0c0a;font-family:'Barlow Condensed',sans-serif;padding:12px;gap:10px;overflow:hidden;height:100vh;width:100vw}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0c0a;font-family:'Barlow Condensed',sans-serif;padding:8px;gap:0;overflow:hidden;height:100vh;width:100vw}
 .scale-wrap{transform-origin:top center;transition:transform .15s}
 .device{width:360px;background:#242422;border-radius:16px 16px 32px 32px;border:1px solid #3a3a38;overflow:hidden}
-.dhead{background:#191917;padding:12px 18px 10px;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
+.dhead{background:#191917;padding:8px 16px 7px;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
 .brand{font-size:22px;font-weight:700;color:#BA7517;letter-spacing:5px}
 .model{font-size:12px;color:#5F5E5A;text-align:right;line-height:1.5}
-.lcd-area{padding:12px 16px}
+.lcd-area{padding:8px 14px}
 .lcd-frame{background:#030803;border-radius:6px;padding:5px;border:1px solid #0a0a08;box-shadow:inset 0 0 20px rgba(0,255,65,.04)}
-.lcd{height:228px;background:#010c01;border-radius:3px;padding:11px 10px;font-family:'Share Tech Mono',monospace;font-size:13px;color:#013a01;transition:background .4s,color .4s;overflow:hidden;position:relative;--fg:#013a01;--bg:#010c01}
+.lcd{height:190px;background:#010c01;border-radius:3px;padding:11px 10px;font-family:'Share Tech Mono',monospace;font-size:13px;color:#013a01;transition:background .4s,color .4s;overflow:hidden;position:relative;--fg:#013a01;--bg:#010c01}
 .lcd.lit{background:#010c01;color:#00ff41;--fg:#00ff41;--bg:#010c01;box-shadow:inset 0 0 30px rgba(0,255,65,.08),0 0 12px rgba(0,255,65,.15)}
 .lcd.lit *{text-shadow:0 0 6px rgba(0,255,65,.7)}
 .lcd.off{background:#000;color:#000;--fg:#000;--bg:#000}
@@ -40,10 +40,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .pbar{width:100%;height:11px;border:1px solid var(--fg);border-radius:1px;margin:8px 0;overflow:hidden}
 .pfill{height:100%;background:var(--fg);transition:width .22s}
 .lfoot{position:absolute;bottom:8px;left:10px;right:10px;font-size:11px;opacity:.3;text-align:center;border-top:1px dotted rgba(0,255,65,.12);padding-top:3px}
-.keypad{padding:8px 16px 22px;display:flex;flex-direction:column;gap:6px}
+.keypad{padding:6px 14px 14px;display:flex;flex-direction:column;gap:5px}
 .krow{display:flex;gap:6px;justify-content:center}
 .kdiv{height:1px;background:#161614;margin:2px 0}
-.key{flex:1;height:36px;background:#363634;border:none;border-bottom:2px solid #181816;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:transform .08s,border-bottom-width .08s;padding:0 2px}
+.key{flex:1;height:30px;background:#363634;border:none;border-bottom:2px solid #181816;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:transform .08s,border-bottom-width .08s;padding:0 2px}
 .key:hover{background:#424240}
 .key:active,.key.pressed{transform:translateY(1px);border-bottom-width:0}
 .klbl{font-size:12px;font-weight:600;color:#7a7a78;text-transform:uppercase;letter-spacing:.3px}
@@ -51,7 +51,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .key-fn{background:#2a2a28}
 .key-fn:hover{background:#363634}
 .key-fn .klbl{color:#8e8e8c;font-size:12px}
-.key-enter{flex:none;width:50px;height:50px;border-radius:8px;background:#18261a;border-bottom:2px solid #0a120c}
+.key-enter{flex:none;width:42px;height:42px;border-radius:7px;background:#18261a;border-bottom:2px solid #0a120c}
 .key-enter:hover{background:#20321e}
 .key-enter:active,.key-enter.pressed{transform:translateY(1px);border-bottom-width:0}
 .key-enter .klbl{color:#639922;font-size:12px}
@@ -59,12 +59,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .key-power:hover{background:#2a2a28;border-color:#666}
 .key-power:active,.key-power.pressed{transform:translateY(1px);border-bottom-width:1px}
 .key-power .ksym{color:#888;font-size:14px}
-.nav-grid{display:grid;grid-template-columns:1fr 50px 1fr;grid-template-rows:36px 50px 36px;gap:6px}
+.nav-grid{display:grid;grid-template-columns:1fr 42px 1fr;grid-template-rows:30px 42px 30px;gap:5px}
 .nav-grid .key,.nav-grid .key-enter,.nav-grid .key-power{width:100%;height:100%;flex:none}
 .nav-grid .key-power{border-radius:50%}
-.hints{display:flex;flex-wrap:wrap;gap:5px 12px;justify-content:center;max-width:360px}
-.hint{font-size:12px;color:#444}
-.hint kbd{font-family:monospace;font-size:11px;background:#141414;border:1px solid #2a2a2a;border-radius:3px;padding:0 5px;color:#888}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -101,34 +98,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
     <div style="height:4px"></div>
   </div>
 </div>
-<div class="hints" id="hints">
-  <span class="hint"><kbd>P</kbd> power</span>
-  <span class="hint"><kbd>B</kbd> backlight</span>
-  <span class="hint"><kbd>↑↓←→</kbd> navigate</span>
-  <span class="hint"><kbd>Enter</kbd> select</span>
-  <span class="hint"><kbd>Esc</kbd> back</span>
-  <span class="hint"><kbd>1–4</kbd> menus</span>
-</div>
+ 
 </div>
 <script>
-// Auto-scale to fit viewport
-function scaleToFit(){
-  var wrap=document.getElementById('scaleWrap');
-  if(!wrap)return;
-  wrap.style.transform='scale(1)';
-  var wh=window.innerHeight-24;
-  var ww=window.innerWidth-24;
-  var h=wrap.scrollHeight;
-  var w=wrap.scrollWidth;
-  var scaleH=wh/h;
-  var scaleW=ww/w;
-  var scale=Math.min(1,scaleH,scaleW);
-  wrap.style.transform='scale('+scale+')';
-  wrap.style.marginTop=scale<1?'-'+(h*(1-scale)/2)+'px':'0';
-}
-window.addEventListener('resize',scaleToFit);
-window.addEventListener('load',scaleToFit);
-setTimeout(scaleToFit,100);
 const lcd=document.getElementById('lcd'),li=document.getElementById('li');
 const S={power:false,lit:false,scr:'off',idx:0,calP:'',calProg:0,calT:null,logs:[],
   sens:{
