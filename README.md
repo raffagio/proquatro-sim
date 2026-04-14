@@ -1,6 +1,6 @@
 # YSI ProQuatro Multiparameter Meter Simulator
 
-An interactive web-based simulator of the YSI ProQuatro handheld water quality meter, built for the JCU BZ2490/5990 Toolkit for the Field Biologist virtual field trip.
+An interactive web-based simulator of the YSI ProQuatro handheld water quality meter, built for the Toolkit for the Field Biologist virtual field trip.
 
 ## Features
 
