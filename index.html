@@ -155,11 +155,11 @@ document.getElementById('startBtn').addEventListener('click',function(){
 const lcd=document.getElementById('lcd'),li=document.getElementById('li');
 const S={power:false,lit:false,scr:'off',idx:0,calP:'',calProg:0,calT:null,logs:[],
   sens:{
-    do:{n:'DO',u:'mg/L',on:true,v:()=>R.do},
-    ph:{n:'pH',u:'',on:true,v:()=>R.ph},
-    sal:{n:'Sal',u:'ppt',on:true,v:()=>R.sal},
     temp:{n:'Temp',u:'°C',on:true,v:()=>R.temp},
-    orp:{n:'ORP',u:'mV',on:true,v:()=>R.orp},
+    do:{n:'DO',u:'mg/L',on:true,v:()=>R.do},
+    sal:{n:'Sal',u:'ppt',on:true,v:()=>R.sal},
+    ph:{n:'pH',u:'',on:true,v:()=>R.ph},
+    orp:{n:'ORP',u:'mV',on:false,v:()=>R.orp},
     nh4:{n:'NH4+',u:'mg/L',on:false,v:()=>R.nh4},
     no3:{n:'NO3-',u:'mg/L',on:false,v:()=>R.no3}
   }
@@ -264,8 +264,8 @@ function sC(){
 function kC(){if(S.calT){clearInterval(S.calT);S.calT=null;}}
 setInterval(()=>{
   if(!S.power)return;
-  R.do=cl(R.do+rnd(-.04,.04),5,12);R.ph=cl(R.ph+rnd(-.015,.015),6,9);
-  R.sal=cl(R.sal+rnd(-.05,.05),30,40);R.temp=cl(R.temp+rnd(-.04,.04),15,35);R.orp=cl(R.orp+rnd(-3,3),100,400);
+  R.do=cl(R.do+rnd(-.03,.03),5,12);R.ph=cl(R.ph+rnd(-.008,.008),6,9);
+  R.sal=cl(R.sal+rnd(-.03,.03),30,40);R.temp=cl(R.temp+rnd(-.02,.02),15,35);R.orp=cl(R.orp+rnd(-3,3),100,400);
   if(S.scr==='run')render();
 },2200);
 document.querySelectorAll('.key').forEach(b=>{
