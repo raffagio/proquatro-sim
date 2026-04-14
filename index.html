@@ -6,7 +6,8 @@
 <title>YSI ProQuatro Simulator</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0c0a;font-family:'Barlow Condensed',sans-serif;padding:20px;gap:16px}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0c0a;font-family:'Barlow Condensed',sans-serif;padding:12px;gap:10px;overflow:hidden;height:100vh;width:100vw}
+.scale-wrap{transform-origin:top center;transition:transform .15s}
 .device{width:360px;background:#242422;border-radius:16px 16px 32px 32px;border:1px solid #3a3a38;overflow:hidden}
 .dhead{background:#191917;padding:12px 18px 10px;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
 .brand{font-size:22px;font-weight:700;color:#BA7517;letter-spacing:5px}
@@ -68,7 +69,7 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="device">
+<div class="scale-wrap" id="scaleWrap"><div class="device">
   <div class="dhead">
     <span class="brand">YSI</span>
     <span class="model">ProQuatro<br>Professional Series</span>
@@ -100,7 +101,7 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
     <div style="height:4px"></div>
   </div>
 </div>
-<div class="hints">
+<div class="hints" id="hints">
   <span class="hint"><kbd>P</kbd> power</span>
   <span class="hint"><kbd>B</kbd> backlight</span>
   <span class="hint"><kbd>↑↓←→</kbd> navigate</span>
@@ -108,7 +109,26 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
   <span class="hint"><kbd>Esc</kbd> back</span>
   <span class="hint"><kbd>1–4</kbd> menus</span>
 </div>
+</div>
 <script>
+// Auto-scale to fit viewport
+function scaleToFit(){
+  var wrap=document.getElementById('scaleWrap');
+  if(!wrap)return;
+  wrap.style.transform='scale(1)';
+  var wh=window.innerHeight-24;
+  var ww=window.innerWidth-24;
+  var h=wrap.scrollHeight;
+  var w=wrap.scrollWidth;
+  var scaleH=wh/h;
+  var scaleW=ww/w;
+  var scale=Math.min(1,scaleH,scaleW);
+  wrap.style.transform='scale('+scale+')';
+  wrap.style.marginTop=scale<1?'-'+(h*(1-scale)/2)+'px':'0';
+}
+window.addEventListener('resize',scaleToFit);
+window.addEventListener('load',scaleToFit);
+setTimeout(scaleToFit,100);
 const lcd=document.getElementById('lcd'),li=document.getElementById('li');
 const S={power:false,lit:false,scr:'off',idx:0,calP:'',calProg:0,calT:null,logs:[],
   sens:{
