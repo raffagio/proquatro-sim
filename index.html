@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YSI ProQuatro Simulator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0c0a;font-family:'Barlow Condensed',sans-serif;padding:20px;gap:16px}
+.device{width:360px;background:#242422;border-radius:16px 16px 32px 32px;border:1px solid #3a3a38;overflow:hidden}
+.dhead{background:#191917;padding:12px 18px 10px;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:22px;font-weight:700;color:#BA7517;letter-spacing:5px}
+.model{font-size:12px;color:#5F5E5A;text-align:right;line-height:1.5}
+.lcd-area{padding:12px 16px}
+.lcd-frame{background:#030803;border-radius:6px;padding:5px;border:1px solid #0a0a08;box-shadow:inset 0 0 20px rgba(0,255,65,.04)}
+.lcd{height:228px;background:#010c01;border-radius:3px;padding:11px 10px;font-family:'Share Tech Mono',monospace;font-size:13px;color:#013a01;transition:background .4s,color .4s;overflow:hidden;position:relative;--fg:#013a01;--bg:#010c01}
+.lcd.lit{background:#010c01;color:#00ff41;--fg:#00ff41;--bg:#010c01;box-shadow:inset 0 0 30px rgba(0,255,65,.08),0 0 12px rgba(0,255,65,.15)}
+.lcd.lit *{text-shadow:0 0 6px rgba(0,255,65,.7)}
+.lcd.off{background:#000;color:#000;--fg:#000;--bg:#000}
+.lcd.lit::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px);pointer-events:none;border-radius:3px}
+.sbar{display:flex;justify-content:space-between;font-size:12px;padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid var(--fg);opacity:.75}
+.param-row{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;border-bottom:1px dotted rgba(0,255,65,.12)}
+.param-row:last-of-type{border-bottom:none}
+.pl{font-size:12px;opacity:.75;min-width:62px}
+.pv{font-size:17px;line-height:1.2}
+.pu{font-size:11px;opacity:.6;margin-left:2px}
+.splash{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.spl-t{font-size:28px;letter-spacing:10px}
+.spl-s{font-size:13px;letter-spacing:3px;opacity:.7}
+.spl-d{font-size:12px;opacity:.4;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:.1}}
+.mtitle{font-size:12px;text-align:center;letter-spacing:2px;border-bottom:1px solid var(--fg);padding-bottom:4px;margin-bottom:5px;opacity:.85}
+.mitem{display:flex;justify-content:space-between;font-size:13px;padding:2px 4px;border-radius:1px}
+.mitem.sel{background:var(--fg)}
+.mitem.sel .mil,.mitem.sel .mir{color:var(--bg)}
+.ititle{font-size:12px;text-align:center;border-bottom:1px solid var(--fg);padding-bottom:4px;margin-bottom:5px;letter-spacing:2px}
+.irow{display:flex;justify-content:space-between;font-size:13px;padding:2px 0}
+.ifooter{font-size:12px;text-align:center;opacity:.45;margin-top:6px;animation:blink 1.5s infinite}
+.pbar{width:100%;height:11px;border:1px solid var(--fg);border-radius:1px;margin:8px 0;overflow:hidden}
+.pfill{height:100%;background:var(--fg);transition:width .22s}
+.lfoot{position:absolute;bottom:8px;left:10px;right:10px;font-size:11px;opacity:.3;text-align:center;border-top:1px dotted rgba(0,255,65,.12);padding-top:3px}
+.keypad{padding:8px 16px 22px;display:flex;flex-direction:column;gap:6px}
+.krow{display:flex;gap:6px;justify-content:center}
+.kdiv{height:1px;background:#161614;margin:2px 0}
+.key{flex:1;height:36px;background:#363634;border:none;border-bottom:2px solid #181816;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:transform .08s,border-bottom-width .08s;padding:0 2px}
+.key:hover{background:#424240}
+.key:active,.key.pressed{transform:translateY(1px);border-bottom-width:0}
+.klbl{font-size:12px;font-weight:600;color:#7a7a78;text-transform:uppercase;letter-spacing:.3px}
+.ksym{font-size:16px;color:#7a7a78}
+.key-fn{background:#2a2a28}
+.key-fn:hover{background:#363634}
+.key-fn .klbl{color:#8e8e8c;font-size:12px}
+.key-enter{flex:none;width:50px;height:50px;border-radius:8px;background:#18261a;border-bottom:2px solid #0a120c}
+.key-enter:hover{background:#20321e}
+.key-enter:active,.key-enter.pressed{transform:translateY(1px);border-bottom-width:0}
+.key-enter .klbl{color:#639922;font-size:12px}
+.key-power{flex:none;border-radius:50%;background:#1e1e1c;border:2px solid #444;border-bottom:3px solid #111}
+.key-power:hover{background:#2a2a28;border-color:#666}
+.key-power:active,.key-power.pressed{transform:translateY(1px);border-bottom-width:1px}
+.key-power .ksym{color:#888;font-size:14px}
+.nav-grid{display:grid;grid-template-columns:1fr 50px 1fr;grid-template-rows:36px 50px 36px;gap:6px}
+.nav-grid .key,.nav-grid .key-enter,.nav-grid .key-power{width:100%;height:100%;flex:none}
+.nav-grid .key-power{border-radius:50%}
+.hints{display:flex;flex-wrap:wrap;gap:5px 12px;justify-content:center;max-width:360px}
+.hint{font-size:12px;color:#444}
+.hint kbd{font-family:monospace;font-size:11px;background:#141414;border:1px solid #2a2a2a;border-radius:3px;padding:0 5px;color:#888}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="device">
+  <div class="dhead">
+    <span class="brand">YSI</span>
+    <span class="model">ProQuatro<br>Professional Series</span>
+  </div>
+  <div class="lcd-area">
+    <div class="lcd-frame">
+      <div class="lcd off" id="lcd"><div id="li"></div></div>
+    </div>
+  </div>
+  <div class="keypad">
+    <div class="krow">
+      <button class="key key-fn" data-a="sys"><span class="klbl">System</span></button>
+      <button class="key key-fn" data-a="probe"><span class="klbl">Sensor</span></button>
+      <button class="key key-fn" data-a="cal"><span class="klbl">Cal</span></button>
+      <button class="key key-fn" data-a="file"><span class="klbl">File</span></button>
+    </div>
+    <div class="kdiv"></div>
+    <div class="nav-grid">
+      <button class="key" data-a="esc"><span class="klbl">Esc</span></button>
+      <button class="key" data-a="up"><span class="ksym">↑</span></button>
+      <button class="key" data-a="bkl"><span class="ksym">☀</span></button>
+      <button class="key" data-a="left"><span class="ksym">←</span></button>
+      <button class="key key-enter" data-a="enter"><span class="klbl">Enter</span></button>
+      <button class="key" data-a="right"><span class="ksym">→</span></button>
+      <div></div>
+      <button class="key" data-a="dn"><span class="ksym">↓</span></button>
+      <button class="key key-power" data-a="power" title="Power"><span class="ksym">⏻</span></button>
+    </div>
+    <div style="height:4px"></div>
+  </div>
+</div>
+<div class="hints">
+  <span class="hint"><kbd>P</kbd> power</span>
+  <span class="hint"><kbd>B</kbd> backlight</span>
+  <span class="hint"><kbd>↑↓←→</kbd> navigate</span>
+  <span class="hint"><kbd>Enter</kbd> select</span>
+  <span class="hint"><kbd>Esc</kbd> back</span>
+  <span class="hint"><kbd>1–4</kbd> menus</span>
+</div>
+<script>
+const lcd=document.getElementById('lcd'),li=document.getElementById('li');
+const S={power:false,lit:false,scr:'off',idx:0,calP:'',calProg:0,calT:null,logs:[],
+  sens:{
+    do:{n:'DO',u:'mg/L',on:true,v:()=>R.do},
+    ph:{n:'pH',u:'',on:true,v:()=>R.ph},
+    cond:{n:'SpCond',u:'µS/cm',on:true,v:()=>R.cond},
+    temp:{n:'Temp',u:'°C',on:true,v:()=>R.temp},
+    orp:{n:'ORP',u:'mV',on:true,v:()=>R.orp},
+    nh4:{n:'NH4+',u:'mg/L',on:false,v:()=>R.nh4},
+    no3:{n:'NO3-',u:'mg/L',on:false,v:()=>R.no3}
+  }
+};
+const R={do:7.42,ph:7.18,cond:387,temp:27.3,orp:212,nh4:0.24,no3:1.8};
+const rnd=(a,b)=>Math.random()*(b-a)+a,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),ff=(n,d)=>n.toFixed(d);
+const nowt=()=>{const d=new Date();return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
+const sbar=()=>`<div class="sbar"><span>SITE:--</span><span>BAT:||||</span><span>${nowt()}</span></div>`;
+const mH=(t,items,sel)=>sbar()+`<div class="mtitle">-- ${t} --</div>`+items.map((it,i)=>`<div class="mitem${i===sel?' sel':''}"><span class="mil">${i===sel?'▶':'\u00a0'} ${it.l}</span><span class="mir">${it.r||''}</span></div>`).join('');
+const iH=(t,rows,ft='')=>sbar()+`<div class="ititle">-- ${t} --</div>`+rows.map(r=>`<div class="irow"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('')+(ft?`<div class="ifooter">${ft}</div>`:'');
+function render(){
+  if(!S.power){lcd.className='lcd off';li.innerHTML='';return;}
+  lcd.className='lcd'+(S.lit?' lit':'');
+  switch(S.scr){
+    case 'splash':li.innerHTML=`<div class="splash"><div class="spl-t">YSI</div><div class="spl-s">ProQuatro</div><div class="spl-s" style="font-size:11px">Professional Series</div><div class="spl-d">Initializing...</div></div>`;break;
+    case 'run':{
+      const rows=Object.keys(S.sens).filter(k=>S.sens[k].on).slice(0,5).map(k=>{
+        const s=S.sens[k],v=s.v(),d=k==='do'?2:k==='ph'?2:k==='cond'?1:k==='temp'?1:k==='orp'?0:2,sg=k==='orp'&&v>=0?'+':'';
+        return `<div class="param-row"><span class="pl">${s.n}</span><span><span class="pv">${sg}${ff(v,d)}</span><span class="pu">${s.u}</span></span></div>`;
+      }).join('');
+      li.innerHTML=sbar()+rows+`<div class="lfoot">ENT=Log · 1-4=Menus · B=Light</div>`;break;
+    }
+    case 'sys':li.innerHTML=mH('SYSTEM',[{l:'Date/Time'},{l:'Language',r:'EN'},{l:'Logging'},{l:'Display'},{l:'GLP'},{l:'About'}],S.idx);break;
+    case 'sys_dt':{const d=new Date();li.innerHTML=iH('DATE/TIME',[['Date:',d.toLocaleDateString('en-AU')],['Time:',nowt()],['Format:','24HR']],'[ ESC ] return');break;}
+    case 'sys_log':li.innerHTML=iH('LOGGING',[['Mode:','Manual'],['Interval:','30 sec'],['Records:',`${S.logs.length}/5000`]],'[ ESC ] return');break;
+    case 'probe':li.innerHTML=mH('SENSOR SETUP',Object.keys(S.sens).map(k=>({l:S.sens[k].n,r:S.sens[k].on?'ON':'OFF'})),S.idx);break;
+    case 'cal':li.innerHTML=mH('CALIBRATE',[{l:'DO'},{l:'pH'},{l:'Conductivity'},{l:'ORP'},{l:'NH4+'},{l:'NO3-'}],S.idx);break;
+    case 'cal_s':{
+      const cfgs={DO:['100% sat','mg/L',ff(R.do,2)],pH:['Buffer 7.00','pH',ff(R.ph,2)],Conductivity:['1000 µS/cm','µS/cm',ff(R.cond,1)],ORP:['220 mV std','mV',ff(R.orp,0)],'NH4+':['1.00 mg/L','mg/L',ff(R.nh4,2)],'NO3-':['10.0 mg/L','mg/L',ff(R.no3,1)]};
+      const c=cfgs[S.calP]||cfgs.DO;
+      li.innerHTML=iH(`CAL: ${S.calP}`,[['Current:',`${c[2]} ${c[1]}`],['Reference:',c[0]]],'ENT=Accept  ESC=Cancel');break;
+    }
+    case 'cal_p':li.innerHTML=sbar()+`<div class="ititle">-- CAL: ${S.calP} --</div><div class="irow" style="justify-content:center">Stabilizing...</div><div class="pbar"><div class="pfill" style="width:${Math.min(100,S.calProg)}%"></div></div><div class="irow" style="justify-content:center">${Math.round(Math.min(100,S.calProg))}%</div>`;break;
+    case 'cal_ok':li.innerHTML=iH(`CAL: ${S.calP}`,[['Status:','ACCEPTED \u2713'],['Offset:','+0.02'],['Slope:','99.8%']],'[ ESC ] return');break;
+    case 'file':li.innerHTML=mH('FILE',[{l:'View Data',r:`(${S.logs.length})`},{l:'Clear All'},{l:'Data IDs'},{l:'GLP Records'}],S.idx);break;
+    case 'file_v':
+      if(!S.logs.length)li.innerHTML=iH('DATA LOG',[['','No records.']],'[ ESC ] return');
+      else{const rec=S.logs[S.logs.length-1];li.innerHTML=iH(`RECORD ${S.logs.length}`,Object.entries(rec.data),'[ ESC ] return');}break;
+    case 'log_q':li.innerHTML=iH('LOG DATA',[['Site:','[--]'],['Time:',nowt()]],'ENT=Confirm  ESC=Cancel');break;
+    case 'log_ok':li.innerHTML=iH('LOG DATA',[['Status:','LOGGED \u2713'],['Record:',`#${S.logs.length}`]],'[ ESC ] return');break;
+  }
+}
+function handle(a){
+  if(a==='power'){
+    if(S.power){S.power=false;S.lit=false;S.scr='off';kC();}
+    else{S.power=true;S.lit=true;S.scr='splash';render();setTimeout(()=>{if(S.scr==='splash'){S.scr='run';}render();},2200);}
+    render();return;
+  }
+  if(!S.power)return;
+  if(a==='bkl'){S.lit=!S.lit;render();return;}
+  const m=S.scr;
+  if(a==='esc'){
+    if(['sys','probe','cal','file'].includes(m))S.scr='run';
+    else if(['sys_dt','sys_log'].includes(m))S.scr='sys';
+    else if(['cal_s','cal_p','cal_ok'].includes(m)){kC();S.scr='cal';}
+    else if(m==='file_v')S.scr='file';
+    else if(['log_q','log_ok'].includes(m))S.scr='run';
+    render();return;
+  }
+  const fm={sys:'sys',probe:'probe',cal:'cal',file:'file'};
+  if(fm[a]&&m!==fm[a]){S.scr=fm[a];S.idx=0;render();return;}
+  const sk=Object.keys(S.sens),cp=['DO','pH','Conductivity','ORP','NH4+','NO3-'];
+  switch(m){
+    case 'run':if(a==='enter')S.scr='log_q';break;
+    case 'sys':
+      if(a==='up')S.idx=Math.max(0,S.idx-1);
+      if(a==='dn')S.idx=Math.min(5,S.idx+1);
+      if(a==='enter'){if(S.idx===0)S.scr='sys_dt';if(S.idx===2)S.scr='sys_log';}break;
+    case 'probe':
+      if(a==='up')S.idx=Math.max(0,S.idx-1);
+      if(a==='dn')S.idx=Math.min(sk.length-1,S.idx+1);
+      if(a==='enter'){const k=sk[S.idx];if(k!=='temp')S.sens[k].on=!S.sens[k].on;}break;
+    case 'cal':
+      if(a==='up')S.idx=Math.max(0,S.idx-1);
+      if(a==='dn')S.idx=Math.min(cp.length-1,S.idx+1);
+      if(a==='enter'){S.calP=cp[S.idx];S.scr='cal_s';}break;
+    case 'cal_s':if(a==='enter')sC();break;
+    case 'file':
+      if(a==='up')S.idx=Math.max(0,S.idx-1);
+      if(a==='dn')S.idx=Math.min(3,S.idx+1);
+      if(a==='enter'){if(S.idx===0)S.scr='file_v';if(S.idx===1)S.logs=[];}break;
+    case 'log_q':if(a==='enter'){dL();S.scr='log_ok';}break;
+  }
+  render();
+}
+function dL(){
+  const data={};
+  Object.keys(S.sens).filter(k=>S.sens[k].on).forEach(k=>{
+    const s=S.sens[k],v=s.v(),d=k==='do'?2:k==='ph'?2:k==='cond'?1:k==='temp'?1:k==='orp'?0:2,sg=k==='orp'&&v>=0?'+':'';
+    data[s.n]=`${sg}${ff(v,d)} ${s.u}`;
+  });
+  S.logs.push({time:nowt(),data});
+}
+function sC(){
+  S.scr='cal_p';S.calProg=0;kC();
+  S.calT=setInterval(()=>{
+    S.calProg+=rnd(6,14);
+    if(S.calProg>=100){kC();setTimeout(()=>{if(S.scr==='cal_p'){S.scr='cal_ok';render();}},300);}
+    if(S.scr==='cal_p')render();
+  },220);
+}
+function kC(){if(S.calT){clearInterval(S.calT);S.calT=null;}}
+setInterval(()=>{
+  if(!S.power)return;
+  R.do=cl(R.do+rnd(-.04,.04),5,12);R.ph=cl(R.ph+rnd(-.015,.015),6,9);
+  R.cond=cl(R.cond+rnd(-2,2),200,800);R.temp=cl(R.temp+rnd(-.04,.04),15,35);R.orp=cl(R.orp+rnd(-3,3),100,400);
+  if(S.scr==='run')render();
+},2200);
+document.querySelectorAll('.key').forEach(b=>{
+  b.addEventListener('click',()=>{
+    b.classList.add('pressed');
+    setTimeout(()=>b.classList.remove('pressed'),130);
+    handle(b.dataset.a);
+  });
+});
+document.addEventListener('keydown',e=>{
+  const map={ArrowUp:'up',ArrowDown:'dn',ArrowLeft:'left',ArrowRight:'right',Enter:'enter',Escape:'esc',p:'power',P:'power',b:'bkl',B:'bkl','1':'sys','2':'probe','3':'cal','4':'file'};
+  if(map[e.key]){e.preventDefault();handle(map[e.key]);}
+});
+render();
+</script>
+</body>
+</html>
